@@ -1,0 +1,10 @@
+[SETTINGS]
+# 入力する元のCSVファイル名を指定します
+input_csv_file = csv_column_extractor/source_data.csv
+
+# 出力する新しいCSVファイル名を指定します
+output_csv_file = csv_column_extractor/extracted_data_pandas.csv
+
+# 抽出したいヘッダー（列名）をカンマ(,)区切りで指定します
+# 例: 氏名,年齢,部署
+target_headers = 氏名,年齢,部署

@@ -40,8 +40,8 @@ def extract_columns_with_pandas(input_filename, output_filename, headers_to_keep
 # --- ここから実行部分 ---
 if __name__ == '__main__':
     # ▼▼▼ 設定を自分の環境に合わせて変更してください ▼▼▼
-    input_csv_file = 'source_data.csv'
-    output_csv_file = 'extracted_data_pandas.csv'
+    input_csv_file = 'csv_column_extractor/source_data.csv'
+    output_csv_file = 'csv_column_extractor/extracted_data_pandas.csv'
     target_headers = ['氏名', '年齢', '部署']
     # ▲▲▲ 設定はここまで ▲▲▲
     

@@ -1,40 +1,52 @@
-import csv
+import pandas as pd
+import configparser
+import sys
 
-def extract_specific_columns(input_filename, output_filename, headers_to_keep):
-    """
-    CSVファイルから指定されたヘッダーの列のみを抽出し、新しいCSVファイルに保存します。
+def load_config(filename='csv_column_extractor/config.ini'):
+    """設定ファイル(config.ini)を読み込む"""
+    config = configparser.ConfigParser()
+    
+    # encoding='utf-8' を指定して日本語の文字化けを防ぐ
+    if not config.read(filename, encoding='utf-8'):
+        print(f"エラー: 設定ファイル '{filename}' が見つからないか、空です。")
+        sys.exit(1) # プログラムを終了
+        
+    settings = config['SETTINGS']
+    
+    # カンマ区切りの文字列をリストに変換
+    # 各要素の前後の空白を削除
+    headers_str = settings.get('target_headers', '')
+    headers_list = [header.strip() for header in headers_str.split(',') if header.strip()]
+    
+    return {
+        'input': settings.get('input_csv_file', ''),
+        'output': settings.get('output_csv_file', ''),
+        'headers': headers_list
+    }
 
-    Args:
-        input_filename (str): 入力CSVファイルのパス。
-        output_filename (str): 出力CSVファイルのパス。
-        headers_to_keep (list): 抽出したいヘッダー名のリスト。
+def extract_columns_with_pandas(input_filename, output_filename, headers_to_keep):
     """
+    pandasを使用して、CSVファイルから指定された列を抽出します。
+    """
+    if not input_filename or not output_filename or not headers_to_keep:
+        print("エラー: 設定ファイルの値が不足しています（input_csv_file, output_csv_file, target_headers）。")
+        return
+
     try:
-        with open(input_filename, 'r', encoding='utf-8', newline='') as infile, \
-             open(output_filename, 'w', encoding='utf-8', newline='') as outfile:
+        df = pd.read_csv(input_filename, encoding='utf-8')
 
-            # 入力ファイルを辞書形式で読み込むリーダーを作成
-            reader = csv.DictReader(infile)
+        existing_headers = [h for h in headers_to_keep if h in df.columns]
+        missing = set(headers_to_keep) - set(existing_headers)
+        if missing:
+            print(f"⚠️ 警告: 次のヘッダーはCSVファイルに存在しませんでした: {', '.join(missing)}")
+        
+        if not existing_headers:
+            print("エラー: 抽出対象のヘッダーがCSVファイルに一つも存在しません。処理を中断します。")
+            return
+            
+        df_extracted = df[existing_headers]
 
-            # headers_to_keepに存在しないヘッダーが指定された場合のエラーチェック
-            missing_headers = set(headers_to_keep) - set(reader.fieldnames)
-            if missing_headers:
-                print(f"エラー: 指定されたヘッダーが見つかりません: {', '.join(missing_headers)}")
-                return
-
-            # 出力ファイルに書き込むライターを作成
-            # fieldnamesには抽出したいヘッダーのリストを指定
-            writer = csv.DictWriter(outfile, fieldnames=headers_to_keep)
-
-            # 最初にヘッダーを書き込む
-            writer.writeheader()
-
-            # 一行ずつループ処理
-            for row in reader:
-                # 抽出したいデータだけを含む新しい辞書を作成
-                extracted_row = {header: row[header] for header in headers_to_keep}
-                # 新しい辞書を一行書き込む
-                writer.writerow(extracted_row)
+        df_extracted.to_csv(output_filename, index=False, encoding='utf-8')
 
         print(f"✅ 処理が完了しました。'{output_filename}' に結果を保存しました。")
 
@@ -46,35 +58,12 @@ def extract_specific_columns(input_filename, output_filename, headers_to_keep):
 
 # --- ここから実行部分 ---
 if __name__ == '__main__':
-    # ▼▼▼ 設定を自分の環境に合わせて変更してください ▼▼▼
-
-    # 1. 元となるCSVファイル名
-    input_csv_file = 'csv_column_extractor/source_data.csv'
-
-    # 2. 保存する新しいCSVファイル名
-    output_csv_file = 'csv_column_extractor/extracted_data.csv'
-
-    # 3. 抽出したいヘッダー（列名）のリスト
-    target_headers = ['氏名', '年齢', '部署']
-
-    # ▲▲▲ 設定はここまで ▲▲▲
-
-
-    # --- サンプルの入力CSVファイルを作成 ---
-    # この部分は動作確認用なので、実際には不要です。
-    # 'source_data.csv'というファイルがすでにある場合は、この部分は実行されません。
-    try:
-        with open(input_csv_file, 'x', encoding='utf-8', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['ID', '氏名', '年齢', '部署', '入社日'])
-            writer.writerow(['001', '山田 太郎', '32', '営業部', '2015-04-01'])
-            writer.writerow(['002', '鈴木 花子', '28', '開発部', '2018-04-01'])
-            writer.writerow(['003', '佐藤 次郎', '45', '人事部', '2005-10-01'])
-        print(f"📝 サンプルファイル '{input_csv_file}' を作成しました。")
-    except FileExistsError:
-        pass # ファイルが既に存在する場合は何もしない
-    # --- サンプル作成ここまで ---
-
-
-    # 関数を実行
-    extract_specific_columns(input_csv_file, output_csv_file, target_headers)
+    # 設定ファイルから設定を読み込む
+    config = load_config()
+    
+    # 読み込んだ設定を使って関数を実行
+    extract_columns_with_pandas(
+        input_filename=config['input'],
+        output_filename=config['output'],
+        headers_to_keep=config['headers']
+    )
