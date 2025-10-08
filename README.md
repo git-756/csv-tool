@@ -65,5 +65,5 @@
 また、このプロジェクトはサードパーティ製のライブラリを利用しています。これらのライブラリのライセンス情報については、[NOTICE.md](NOTICE.md) ファイルに記載しています。
 
 ## 作成者
-Samurai-Human-Go
+[Samurai-Human-Go](https://samurai-human-go.com/%e9%81%8b%e5%96%b6%e8%80%85%e6%83%85%e5%a0%b1/)
 - [ブログ記事: 【Python開発物語】CSV列抽出スクリプトが「賢いツール」に進化するまで（Pandasと設定ファイル）](https://samurai-human-go.com/python-pandas-csv-tool-story/)
