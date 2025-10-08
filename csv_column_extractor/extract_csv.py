@@ -46,7 +46,10 @@ def extract_columns_with_pandas(input_filename, output_filename, headers_to_keep
             
         df_extracted = df[existing_headers]
 
-        df_extracted.to_csv(output_filename, index=False, encoding='utf-8')
+        # ▼▼▼ ここを変更しました ▼▼▼
+        # Excelで日本語が文字化けしないように、BOM付きUTF-8(utf-8-sig)で出力
+        df_extracted.to_csv(output_filename, index=False, encoding='utf-8-sig')
+        # ▲▲▲ 変更ここまで ▲▲▲
 
         print(f"✅ 処理が完了しました。'{output_filename}' に結果を保存しました。")
 
