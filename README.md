@@ -24,7 +24,7 @@
 
 1.  **リポジトリのクローンまたはダウンロード**
     ```bash
-    git clone [https://github.com/git-756/csv-tool.git](https://github.com/git-756/csv-tool.git)
+    git clone https://github.com/git-756/csv-tool.git
     cd csv-tool
     ```
 
