@@ -8,3 +8,9 @@ wheels/
 
 # venv
 .venv
+
+# csv
+*.csv
+*.xlsx
+*.xlsm
+*.xlsb
